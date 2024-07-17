@@ -71,6 +71,7 @@ my @user_agent_list = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Firefox/89.0",
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
 );
+
 # Initialize PokemonScraper object
 my $scraper = PokemonScraper->new(
     user_agent_list => \@user_agent_list,
@@ -96,5 +97,12 @@ perl scrape.pl
 ### Responsible Scraping Practices
 - **Respect Site Policies**: Adhere to the terms of service and robots.txt of the target website (pokemondb.net) to ensure ethical scraping practices.
 - **Use Delays**: Implement delays between requests to prevent overwhelming the server and to simulate human-like browsing behavior.
+
+
+## Future releases
+- Additional script to push data into RedisJSON structure
+- 12-Factor App Compliance
+- Dockerfile
+- Production deployment config
 
 Happy Coding & Exploring!
