@@ -2,29 +2,27 @@
 use strict;
 use utf8;
 use warnings;
-use LWP::UserAgent;
 
 use DBI;
-
-use Parallel::ForkManager;
+use LWP::UserAgent;
 use List::Util qw(shuffle);
-use Mojolicious::Lite;
-use Mojo::UserAgent;
 use Mojo::DOM;
 use Mojo::JSON;
-use Data::Dumper;
+use Mojolicious::Lite;
+use Mojo::UserAgent;
+
 
 # Constants
 my $BASE_URL = 'https://pokemondb.net';
 my $MAX_CONCURRENCY = 5;
-my $MAX_POKEMON = 100;
+my $MAX_POKEMON = 10;
 
 # Database config
 my $dbname = 'pokemondb';
 my $host = 'localhost';
 my $port = '5432';
 my $user = 'postgres';
-my $password = 'XXX';
+my $password = 'Cunyono*189';
 
 my $dbh = DBI->connect("dbi:Pg:dbname=$dbname;host=$host;port=$port", $user, $password, {
     PrintError => 0,
@@ -153,9 +151,7 @@ sub start_scraping {
 
 sub fetch_pokemon_details {
     my ($self) = @_;
-
     my @urls = @{$self->{urls}};
-
     my $ua = Mojo::UserAgent->new;
     my @promises;
     my $tx_count = 0;
@@ -210,17 +206,15 @@ sub fetch_pokemon_details {
 
 sub process_pokemon_data {
     my ($self, $content) = @_;
-    my %pokemon_data;
     my $pokemon_name;
+    my %pokemon_data;
     my @pokemon_types;
+
     my $dom = Mojo::DOM->new($content);
 
     $pokemon_name = $dom->at('h1')->text;
-
     my $pokedex_dom = $dom->find('table.vitals-table')->[0];
     my $stats_dom = $dom->find('table.vitals-table')->[3];
-    say $stats_dom;
-
     my ($species, @pokemon_types) = $self->_parse_pokedex_data($pokedex_dom);
     my $stats_json_data  = $self->_parse_stats_table($stats_dom);
 
@@ -256,8 +250,6 @@ sub _parse_pokedex_data {
     my @pokemon_types;
     my $species;
 
-    say 'Pokedex function ran';
-
     # Find the "Type" row
     for my $tr ($dom_obj->find('tr')->each) {
         if ($tr->at('th') && $tr->at('th')->text eq 'Type') {
@@ -276,7 +268,6 @@ sub _parse_pokedex_data {
     # Find the "Species" row
     for my $tr ($dom_obj->find('tr')->each) {
         if ($tr->at('th') && $tr->at('th')->text eq 'Species') {
-            say 'Species row found';
             $species_row = $tr;
             last;
         }
@@ -289,7 +280,6 @@ sub _parse_pokedex_data {
         say $species if defined $species;
     }
 
-    say "Species: $species" if defined $species;
     return ($species, @pokemon_types);
 }
 
@@ -324,8 +314,6 @@ sub _parse_stats_table {
 
         # Ensure $td_text is defined before assigning to %stats
         $stats{$th_text} = $td_text if defined $td_text;
-
-        say "Stats hash: " . join(', ', %stats);  # Debugging output
     });
 
     # Print each key-value pair in %stats for debugging
@@ -340,12 +328,16 @@ sub _parse_stats_table {
     return $json_data;
 }
 
+package main;
+
 my $scraper = PokemonScraper->new(
     user_agent_list => \@user_agent_list,
     max_pokemon => $MAX_POKEMON,
     max_concurrency => $MAX_CONCURRENCY,
     dbh => $dbh,
 );
- 
+
 $scraper->start_scraping();
 $scraper->fetch_pokemon_details();
+
+$dbh->disconnect();
