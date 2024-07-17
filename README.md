@@ -35,4 +35,9 @@ perl init_db.pl
 perl scrape.pl
 ```
 
-Happy Exploring!
+# DISCLAIMER
+## Responsible Scraping Practices
+**Respect Site Policies**: Adhere to the terms of service and robots.txt of the target website (pokemondb.net) to ensure ethical scraping practices.
+**Use Delays**: Implement delays between requests to prevent overwhelming the server and to simulate human-like browsing behavior.
+
+Happy Coding & Exploring!
