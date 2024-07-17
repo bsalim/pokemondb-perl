@@ -25,7 +25,7 @@ cpanm --installdeps .
 ```
 
 ## How to run
-### Initialize DB schema & Change the necessary 
+### Initialize DB schema & Change the necessary DB config
 ```bash
 perl init_db.pl
 ```
