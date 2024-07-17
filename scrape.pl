@@ -16,8 +16,8 @@ use Data::Dumper;
 
 # Constants
 my $BASE_URL = 'https://pokemondb.net';
-my $MAX_PROCESSES = 5;   
-my $MAX_POKEMON = 1020;  
+my $MAX_CONCURRENCY = 5;
+my $MAX_POKEMON = 100;
 
 # Database config
 my $dbname = 'pokemondb';
@@ -94,9 +94,11 @@ sub new {
         base_url => $BASE_URL,
         main_url => $BASE_URL . '/pokedex/all',
         urls => [],
-        max_pokemon => $args{max_pokemon} || 100, 
+        max_pokemon => $args{max_pokemon} || $MAX_POKEMON, 
+        max_concurrency => $args{max_concurrency} || $MAX_CONCURRENCY,
         dbh => $args{dbh},  
     };
+
 
     bless $self, $class;
     return $self;
@@ -153,16 +155,14 @@ sub fetch_pokemon_details {
     my ($self) = @_;
 
     my @urls = @{$self->{urls}};
-    my $max_pokemon = $self->{max_pokemon};  # Number of Pokémon to scrape
-    my $max_concurrent = 10;  # Adjust this as needed to control concurrency
 
     my $ua = Mojo::UserAgent->new;
     my @promises;
     my $tx_count = 0;
 
-    for my $index (0 .. $max_pokemon - 1) {
+    for my $index (0 .. $self->{max_pokemon} - 1) {
         # Ensure we don't exceed the maximum number of concurrent requests
-        if ($tx_count >= $max_concurrent) {
+        if ($tx_count >= $self->{max_concurrency}) {
             Mojo::Promise->all(@promises)->wait;
             @promises = ();
             $tx_count = 0;
@@ -224,20 +224,18 @@ sub process_pokemon_data {
     my ($species, @pokemon_types) = $self->_parse_pokedex_data($pokedex_dom);
     my $stats_json_data  = $self->_parse_stats_table($stats_dom);
 
-    
+    %pokemon_data = (
+        'name' => $pokemon_name,
+        'species' => $species,
+        'types' => \@pokemon_types,
+        'stats' => $stats_json_data
+    );
     # DEBUGGING
     # say "Pokemon: $pokemon_name";
     # say "Species: $species";
     # say "Stats: $stats_json_data";
     # say "Types: @pokemon_types";
     
-    # %pokemon_data = (
-    #     'name' => $pokemon_name,
-    #     'species' => $species,
-    #     'types' => \@pokemon_types,
-    #     'stats' => $stats_json_data
-    # );
-
     # foreach my $key (keys %pokemon_data) {
     # say $key;
     # my $value = $pokemon_data{$key};
@@ -248,7 +246,6 @@ sub process_pokemon_data {
     # say "$key: $value";
     # }
     # say %pokemon_data;
-
     $self->insert_pokemon_data(\%pokemon_data);
 }
 
@@ -345,7 +342,8 @@ sub _parse_stats_table {
 
 my $scraper = PokemonScraper->new(
     user_agent_list => \@user_agent_list,
-    max_pokemon => 50,
+    max_pokemon => $MAX_POKEMON,
+    max_concurrency => $MAX_CONCURRENCY,
     dbh => $dbh,
 );
  
