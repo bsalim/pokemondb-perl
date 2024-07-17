@@ -22,7 +22,7 @@ my $dbname = 'pokemondb';
 my $host = 'localhost';
 my $port = '5432';
 my $user = 'postgres';
-my $password = 'Cunyono*189';
+my $password = 'XXX';
 
 my $dbh = DBI->connect("dbi:Pg:dbname=$dbname;host=$host;port=$port", $user, $password, {
     PrintError => 0,
