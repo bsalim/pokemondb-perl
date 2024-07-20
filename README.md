@@ -26,6 +26,17 @@ cpanm --installdeps .
 
 ## Configuration Guidelines
 
+### ENV configuration
+
+Create a `.env` file in the root directory of your project with the following example for DB configuration:
+
+```ini
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASS=xxx
+DB_NAME='pokemondb'
+
 ### Using Constants and Configuration
 
 When configuring the `PokemonScraper` object, use constants and guidelines to ensure clarity and maintainability in your Perl script:
@@ -56,13 +67,6 @@ When initializing the `PokemonScraper` object, consider the following guidelines
 my $BASE_URL = 'https://pokemondb.net';
 my $MAX_CONCURRENCY = 5;
 my $MAX_POKEMON = 100;
-
-# Database configuration (replace with your actual database details)
-my $dbname = 'pokemondb';
-my $host = 'localhost';
-my $port = '5432';
-my $user = 'postgres';
-my $password = 'XXX';
 
 
 my @user_agent_list = (
