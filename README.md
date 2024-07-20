@@ -36,6 +36,7 @@ DB_PORT=5432
 DB_USER=postgres
 DB_PASS=xxx
 DB_NAME='pokemondb'
+```
 
 ### Using Constants and Configuration
 
