@@ -3,6 +3,70 @@ use strict;
 use utf8;
 use warnings;
 
+=head1 NAME
+
+scrape.pl - Perl script to connect to an external Pokémon source, scrape, and collect Pokémon data into a PostgreSQL database.
+
+=head1 SYNOPSIS
+
+    perl scrape.pl 
+
+=head1 DESCRIPTION
+
+This script connects to an external Pokémon data source, scrapes the data, and stores it in a PostgreSQL database. It retrieves comprehensive Pokémon information, formats it into appropriate database entries, and inserts these entries into the specified PostgreSQL database.
+
+=head1 CONFIGURATION
+
+Before running this script, ensure that your PostgreSQL database is properly set up. You can initialize the database schema by running the `init_db.pl` script. This script will create the necessary tables and structures in your PostgreSQL database.
+
+=head1 DEPENDENCIES
+
+=over 4
+
+=item *
+
+Perl 5.10 or later
+
+=item *
+
+DBI - Database interaction module
+
+=item *
+
+ENV::Util - Utility module for environment variable handling
+
+=item *
+
+Mojolicious::Lite - Lightweight web framework for building web applications
+
+=item *
+
+Mojo::UserAgent - HTTP user agent for making web requests
+
+=item *
+
+Mojo::DOM - DOM manipulation module for parsing HTML
+
+=item *
+
+Mojo::JSON - JSON handling module for encoding and decoding
+
+=item *
+
+PostgreSQL for database storage
+
+=back
+
+=head1 AUTHOR
+
+Budiyono Salim
+
+=head1 COPYRIGHT AND LICENSE
+
+This script is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut
+
 use DBI;
 use LWP::UserAgent;
 use List::Util qw(shuffle);
@@ -10,19 +74,20 @@ use Mojo::DOM;
 use Mojo::JSON;
 use Mojolicious::Lite;
 use Mojo::UserAgent;
+use ENV::Util -load_dotenv;
 
 
 # Constants
 my $BASE_URL = 'https://pokemondb.net';
-my $MAX_CONCURRENCY = 5;
-my $MAX_POKEMON = 10;
+my $MAX_CONCURRENCY = 1;
+my $MAX_POKEMON = 1;
 
 # Database config
-my $dbname = 'pokemondb';
-my $host = 'localhost';
-my $port = '5432';
-my $user = 'postgres';
-my $password = 'XXX';
+my $dbname = $ENV{DB_NAME};
+my $host = $ENV{DB_HOST};
+my $port = $ENV{DB_PORT};
+my $user = $ENV{DB_USER};
+my $password = $ENV{DB_PASS};
 
 my $dbh = DBI->connect("dbi:Pg:dbname=$dbname;host=$host;port=$port", $user, $password, {
     PrintError => 0,
@@ -208,7 +273,6 @@ sub process_pokemon_data {
     my ($self, $content) = @_;
     my $pokemon_name;
     my %pokemon_data;
-    my @pokemon_types;
 
     my $dom = Mojo::DOM->new($content);
 
