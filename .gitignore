@@ -1,0 +1,57 @@
+# Ignore Perl build artifacts and temporary files
+_build/
+blib/
+*.tar.gz
+*.zip
+*.tgz
+*.gz
+
+# Ignore Perl local configuration files
+*.local
+
+# Ignore Perl module installation paths
+*.pm
+
+# Ignore Perl-specific temporary files
+*.tmp
+*.swp
+*.bak
+*.orig
+
+# Ignore logs and other runtime files
+*.log
+*.pid
+*.pid.lock
+*.sqlite
+
+# Ignore compiled or temporary files
+*.o
+*.a
+*.so
+
+# Ignore test-related files
+*.t
+*.test
+*.pl~    # Temporary Perl script files that might be edited temporarily
+
+# Ignore local and system-specific configuration files
+.env
+config.yaml
+*.conf
+
+# Ignore IDE and editor-specific files
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Ignore macOS Finder metadata
+.DS_Store
+
+# Ignore Windows-specific files
+Thumbs.db
+ehthumbs.db
+
+# Ignore Perl project-specific files
+local/
+dist/
